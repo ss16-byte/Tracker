@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shashank's IAT 2026 Command Center</title>
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-glow: rgba(79, 70, 229, 0.4);
+            --bg: #f8fafc;
+            --card: #ffffff;
+            --text: #1e293b;
+            --text-muted: #64748b;
+            --success: #10b981;
+            --border: #e2e8f0;
+            --card-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+
+        /* Deep Space Dark Theme */
+        [data-theme="dark"] {
+            --primary: #6366f1;
+            --primary-glow: rgba(99, 102, 241, 0.6);
+            --bg: #0f172a;
+            --card: #1e293b;
+            --text: #f8fafc;
+            --text-muted: #94a3b8;
+            --success: #34d399;
+            --border: #334155;
+            --card-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.5), 0 4px 6px -4px rgb(0 0 0 / 0.5);
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            transition: background-color 0.4s ease, color 0.4s ease;
+        }
+
+        .dashboard {
+            width: 100%;
+            max-width: 900px;
+            display: grid;
+            gap: 25px;
+        }
+
+        /* Top Bar & Toggle */
+        .top-bar {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: -10px;
+        }
+        .theme-toggle {
+            background: var(--card);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 10px 20px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: var(--card-shadow);
+            transition: all 0.3s ease;
+        }
+        .theme-toggle:hover {
+            border-color: var(--primary);
+            box-shadow: 0 0 10px var(--primary-glow);
+        }
+
+        .header {
+            text-align: center;
+            padding: 30px;
+            background: var(--card);
+            border-radius: 16px;
+            box-shadow: var(--card-shadow);
+            border-top: 4px solid var(--primary);
+            transition: background-color 0.4s ease;
+        }
+        .header h1 { margin: 0; color: var(--text); font-size: 34px; letter-spacing: -0.5px; }
+        .header h1 span { color: var(--primary); }
+        .header p { margin: 8px 0 0; font-weight: 600; color: var(--text-muted); font-size: 16px; letter-spacing: 1px; text-transform: uppercase;}
+        
+        .card {
+            background: var(--card);
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: var(--card-shadow);
+            transition: background-color 0.4s ease;
+        }
+        .card h2 { margin-top: 0; border-bottom: 1px solid var(--border); padding-bottom: 15px; color: var(--text); font-size: 22px;}
+        
+        /* Habits */
+        .habit-item {
+            display: flex;
+            align-items: center;
+            padding: 16px;
+            margin-bottom: 12px;
+            background: var(--bg);
+            border-radius: 12px;
+            transition: all 0.2s ease;
+            font-weight: 500;
+            border: 1px solid transparent;
+        }
+        .habit-item:hover { 
+            border-color: var(--primary);
+            box-shadow: 0 0 8px var(--primary-glow);
+            transform: translateX(5px);
+        }
+        .habit-item input[type="checkbox"] { margin-right: 15px; transform: scale(1.5); cursor: pointer; accent-color: var(--primary); }
+        
+        /* Syllabus Bars & Chapters */
+        .subject { margin-bottom: 25px; padding: 20px; border: 1px solid var(--border); border-radius: 12px; background: var(--bg);}
+        .subject-header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            font-weight: 700; 
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+        .progress-bg { 
+            width: 100%; 
+            background: var(--card); 
+            border-radius: 999px; 
+            height: 12px; 
+            overflow: hidden; 
+            margin-bottom: 15px;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .progress-fill { 
+            height: 100%; 
+            background: linear-gradient(90deg, #3b82f6, var(--primary)); 
+            border-radius: 999px; 
+            transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1); 
+            box-shadow: 0 0 10px var(--primary-glow);
+        }
+        
+        details { background: var(--card); border-radius: 8px; padding: 12px; border: 1px solid var(--border); transition: all 0.3s ease;}
+        summary { font-weight: 600; cursor: pointer; color: var(--primary); outline: none; list-style: none; display: flex; align-items: center; gap: 8px;}
+        summary::before { content: '▶'; font-size: 12px; transition: 0.2s; }
+        details[open] summary::before { transform: rotate(90deg); }
+        
+        .chapter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 12px;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px dashed var(--border);
+        }
+        .chapter-label {
+            display: flex;
+            align-items: flex-start;
+            font-size: 14px;
+            cursor: pointer;
+            color: var(--text-muted);
+            transition: color 0.2s;
+        }
+        .chapter-label:hover { color: var(--text); }
+        .chapter-label input { margin-right: 10px; margin-top: 2px; accent-color: var(--primary);}
+
+        /* Calculator */
+        .calc-wrapper { display: flex; gap: 15px; margin-bottom: 20px; }
+        .calc-wrapper input[type="number"] {
+            flex: 1;
+            padding: 15px;
+            background: var(--bg);
+            color: var(--text);
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        .calc-wrapper input[type="number"]:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 10px var(--primary-glow);
+        }
+        button {
+            padding: 15px 30px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        button:hover { 
+            background: #4338ca; 
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px var(--primary-glow);
+        }
+        #odds-result {
+            padding: 20px;
+            border-radius: 10px;
+            background: var(--bg);
+            border-left: 4px solid var(--primary);
+            font-weight: 500;
+            line-height: 1.6;
+            min-height: 24px;
+        }
+    </style>
+</head>
+<body data-theme="dark">
+
+<div class="dashboard">
+    <div class="top-bar">
+        <button class="theme-toggle" id="theme-btn">
+            <span id="theme-icon">☀️</span> Light Mode
+        </button>
+    </div>
+
+    <div class="header">
+        <h1>Shashank's IAT <span>2026</span> Command Center</h1>
+        <p>Target: 160/240 | Trajectory: IISER Bhopal</p>
+    </div>
+
+    <div class="card">
+        <h2>Daily Routines & Habits</h2>
+        <div id="habits-list">
+            <label class="habit-item"><input type="checkbox" id="h1"> Morning WorkOut</label>
+            <label class="habit-item"><input type="checkbox" id="h2"> Music Class</label>
+            <label class="habit-item"><input type="checkbox" id="h3"> Song Writing Session</label>
+            <label class="habit-item"><input type="checkbox" id="h4"> Breathing Exercises</label>
+            <label class="habit-item"><input type="checkbox" id="h5"> Feed Shadow Bolt & Doberman</label>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>Syllabus Tracker</h2>
+        
+        <div class="subject">
+            <div class="subject-header">
+                <span>Physics</span> 
+                <span id="text-phy" style="color: var(--primary); font-size: 24px;">0%</span>
+            </div>
+            <div class="progress-bg"><div class="progress-fill" id="fill-phy" style="width: 0%;"></div></div>
+            <details>
+                <summary>Module Subsystems</summary>
+                <div class="chapter-grid" id="grid-phy"></div>
+            </details>
+        </div>
+        
+        <div class="subject">
+            <div class="subject-header">
+                <span>Chemistry</span> 
+                <span id="text-chem" style="color: var(--primary); font-size: 24px;">0%</span>
+            </div>
+            <div class="progress-bg"><div class="progress-fill" id="fill-chem" style="width: 0%;"></div></div>
+            <details>
+                <summary>Module Subsystems</summary>
+                <div class="chapter-grid" id="grid-chem"></div>
+            </details>
+        </div>
+        
+        <div class="subject">
+            <div class="subject-header">
+                <span>Mathematics</span> 
+                <span id="text-math" style="color: var(--primary); font-size: 24px;">0%</span>
+            </div>
+            <div class="progress-bg"><div class="progress-fill" id="fill-math" style="width: 0%;"></div></div>
+            <details>
+                <summary>Module Subsystems</summary>
+                <div class="chapter-grid" id="grid-math"></div>
+            </details>
+        </div>
+        
+        <div class="subject">
+            <div class="subject-header">
+                <span>Biology</span> 
+                <span id="text-bio" style="color: var(--primary); font-size: 24px;">0%</span>
+            </div>
+            <div class="progress-bg"><div class="progress-fill" id="fill-bio" style="width: 0%;"></div></div>
+            <details>
+                <summary>Module Subsystems</summary>
+                <div class="chapter-grid" id="grid-bio"></div>
+            </details>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>IISER Bhopal Odds Calculator</h2>
+        <div class="calc-wrapper">
+            <input type="number" id="mock-score" placeholder="Enter latest mock score (Out of 240)" max="240" min="0">
+            <button onclick="calculateOdds()">Calculate</button>
+        </div>
+        <div id="odds-result">Awaiting telemetry...</div>
+    </div>
+</div>
+
+<script>
+    // --- 0. Theme Toggle ---
+    const themeBtn = document.getElementById('theme-btn');
+    const themeIcon = document.getElementById('theme-icon');
+    
+    // Check saved theme or default to dark
+    const savedTheme = localStorage.getItem('shashank-theme') || 'dark';
+    document.body.setAttribute('data-theme', savedTheme);
+    updateThemeUI(savedTheme);
+
+    themeBtn.addEventListener('click', () => {
+        const currentTheme = document.body.getAttribute('data-theme');
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        
+        document.body.setAttribute('data-theme', newTheme);
+        localStorage.setItem('shashank-theme', newTheme);
+        updateThemeUI(newTheme);
+    });
+
+    function updateThemeUI(theme) {
+        if (theme === 'dark') {
+            themeIcon.innerText = '☀️';
+            themeBtn.innerHTML = '<span id="theme-icon">☀️</span> Light Mode';
+        } else {
+            themeIcon.innerText = '🌙';
+            themeBtn.innerHTML = '<span id="theme-icon">🌙</span> Dark Mode';
+        }
+    }
+
+    // --- 1. Syllabus Data ---
+    const syllabus = {
+        phy: [
+            "Physical World & Measurement", "Kinematics", "Laws of Motion", "Work, Energy & Power", 
+            "Rotational Motion", "Gravitation", "Properties of Solids & Liquids", "Thermodynamics", 
+            "Kinetic Theory of Gases", "Oscillations & Waves", "Electrostatics", "Current Electricity", 
+            "Magnetic Effects of Current", "EMI & AC", "Electromagnetic Waves", "Optics", 
+            "Dual Nature of Matter", "Atoms & Nuclei", "Electronic Devices"
+        ],
+        chem: [
+            "Basic Concepts of Chemistry", "Structure of Atom", "Classification & Periodicity", 
+            "Chemical Bonding", "States of Matter", "Thermodynamics", "Equilibrium", "Redox Reactions", 
+            "Solutions", "Electrochemistry", "Chemical Kinetics", "Surface Chemistry", 
+            "p-Block Elements", "d & f Block Elements", "Coordination Compounds", "Basic Organic Chemistry", 
+            "Hydrocarbons", "Haloalkanes & Haloarenes", "Alcohols, Phenols & Ethers", 
+            "Aldehydes, Ketones & Carboxylic Acids", "Amines", "Biomolecules"
+        ],
+        math: [
+            "Sets, Relations & Functions", "Trigonometric Functions", "Complex Numbers", 
+            "Linear Inequalities", "Permutations & Combinations", "Binomial Theorem", "Sequences & Series", 
+            "Straight Lines", "Conic Sections", "3D Geometry", "Limits & Derivatives", 
+            "Statistics & Probability", "Matrices & Determinants", "Continuity & Differentiability", 
+            "Application of Derivatives", "Integrals", "Application of Integrals", "Differential Equations", "Vectors"
+        ],
+        bio: [
+            "Diversity in Living World", "Structural Organization in Animals & Plants", 
+            "Cell Structure & Function", "Plant Physiology", "Human Physiology", "Reproduction", 
+            "Genetics & Evolution", "Biology & Human Welfare", "Biotechnology & its Applications", 
+            "Ecology & Environment"
+        ]
+    };
+
+    // --- 2. Generate Chapters & Handle Progress ---
+    Object.keys(syllabus).forEach(subject => {
+        const grid = document.getElementById(`grid-${subject}`);
+        
+        syllabus[subject].forEach((chapter, index) => {
+            const label = document.createElement('label');
+            label.className = 'chapter-label';
+            
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.className = `${subject}-check`;
+            checkbox.id = `${subject}-chap-${index}`;
+            
+            checkbox.checked = localStorage.getItem(checkbox.id) === 'true';
+            
+            checkbox.addEventListener('change', () => {
+                localStorage.setItem(checkbox.id, checkbox.checked);
+                updateProgress(subject);
+            });
+
+            label.appendChild(checkbox);
+            label.appendChild(document.createTextNode(chapter));
+            grid.appendChild(label);
+        });
+
+        updateProgress(subject);
+    });
+
+    function updateProgress(subject) {
+        const checkboxes = document.querySelectorAll(`.${subject}-check`);
+        const checkedBoxes = document.querySelectorAll(`.${subject}-check:checked`);
+        
+        const percentage = Math.round((checkedBoxes.length / checkboxes.length) * 100);
+        
+        document.getElementById(`fill-${subject}`).style.width = percentage + '%';
+        document.getElementById(`text-${subject}`).innerText = percentage + '%';
+    }
+
+    // --- 3. Handle Daily Checkboxes ---
+    document.querySelectorAll('.habit-item input').forEach(checkbox => {
+        checkbox.checked = localStorage.getItem(checkbox.id) === 'true';
+        checkbox.addEventListener('change', (e) => {
+            localStorage.setItem(e.target.id, e.target.checked);
+        });
+    });
+
+    // --- 4. Handle Calculator ---
+    const savedScore = localStorage.getItem('shashank-mock-score');
+    if (savedScore) {
+        document.getElementById('mock-score').value = savedScore;
+        calculateOdds(); 
+    }
+
+    function calculateOdds() {
+        const score = parseFloat(document.getElementById('mock-score').value);
+        const resultDiv = document.getElementById('odds-result');
+        
+        if (isNaN(score) || score < 0 || score > 240) {
+            resultDiv.innerHTML = "<span style='color:#ef4444;'>Enter a valid score (0-240).</span>";
+            return;
+        }
+
+        localStorage.setItem('shashank-mock-score', score);
+        let percentage = (score / 160) * 100;
+        let color = "var(--text)", message = "";
+
+        if (score >= 160) {
+            percentage = 99; 
+            color = "var(--success)";
+            message = "🔥 Phenomenal. At 160+, you're easily looking at a top rank. IISER Bhopal is in the bag.";
+        } else if (score >= 135) {
+            color = "#f97316"; // Orange
+            message = "🚀 Strong zone! You're hitting historical cutoff ranks. Push on weak chapters to build a buffer.";
+        } else if (score >= 100) {
+            color = "#eab308"; // Yellow
+            message = "📈 Good baseline, but you need more accuracy. Ruthlessly analyze your mock errors.";
+        } else {
+            color = "#ef4444"; // Red
+            message = "⚡ Keep grinding. Target your highest-weightage unchecked chapters above.";
+        }
+
+        resultDiv.innerHTML = `<strong>Trajectory: ${Math.min(percentage, 99).toFixed(1)}% to Target</strong><br><span style="color:${color}; display:inline-block; margin-top:5px;">${message}</span>`;
+    }
+</script>
+</body>
+</html>
