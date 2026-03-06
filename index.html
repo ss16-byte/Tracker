@@ -4,30 +4,105 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>The Event: 94 Days to IAT</title>
-    <section style="font-family: 'Segoe UI', sans-serif; background-color: #f8f9fa; padding: 20px; border-radius: 12px; margin-top: 20px; border-left: 5px solid #3498db;">
-    <h2 style="color: #2c3e50; margin-top: 0;">🏆 Mission Achievements</h2>
+    
+<div id="mission-control" style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 800px; margin: 20px auto; background: #ffffff; border-radius: 15px; padding: 25px; border: 1px solid #d1d5da; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+    
+    <h1 style="color: #0366d6; text-align: center; margin-bottom: 30px;">🛰️ Researcher Mission Control</h1>
 
-    <div style="margin-bottom: 15px;">
-        <strong>Days to IAT (June 7):</strong> 93 Days
-        <div style="background-color: #e0e0e0; border-radius: 10px; height: 12px; width: 100%; margin-top: 5px;">
-            <div style="background-color: #e74c3c; height: 12px; width: 8%; border-radius: 10px;"></div>
-        </div>
+    <div style="background: #f6f8fa; padding: 15px; border-radius: 10px; text-align: center; margin-bottom: 25px; border: 1px solid #0366d6;">
+        <span style="font-size: 1.2em; color: #24292e;">Days until <b>IAT 2026</b> (June 7):</span>
+        <h2 id="countdown-timer" style="font-size: 3em; color: #e74c3c; margin: 10px 0;">--</h2>
     </div>
 
-    <div style="margin-bottom: 15px;">
-        <strong>Berklee Music Production:</strong> Module 1 Complete (87.5%)
-        <div style="background-color: #e0e0e0; border-radius: 10px; height: 12px; width: 100%; margin-top: 5px;">
-            <div style="background-color: #2ecc71; height: 12px; width: 100%; border-radius: 10px;"></div>
+    <div class="tracker-grid">
+        
+        <div class="tracker-card" style="margin-bottom: 25px; padding: 15px; border: 1px solid #e1e4e8; border-radius: 10px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h3 style="margin: 0; color: #e67e22;">📐 Math Improvement (March 9)</h3>
+                <span id="math-percent" style="font-weight: bold;">0%</span>
+            </div>
+            <div style="background: #eee; height: 10px; border-radius: 5px; margin: 10px 0;">
+                <div id="math-bar" style="background: #e67e22; height: 100%; width: 0%; border-radius: 5px; transition: width 0.5s;"></div>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 0.9em;">
+                <label><input type="checkbox" class="math-check" onchange="updateProgress()"> 3D Geometry</label>
+                <label><input type="checkbox" class="math-check" onchange="updateProgress()"> Vectors Logic</label>
+                <label><input type="checkbox" class="math-check" onchange="updateProgress()"> LPP Visuals</label>
+                <label><input type="checkbox" class="math-check" onchange="updateProgress()"> Probability</label>
+            </div>
         </div>
-    </div>
 
-    <div style="margin-bottom: 15px;">
-        <strong>Princeton Astronomy:</strong> Enrolled & Active 🪐
-        <div style="background-color: #e0e0e0; border-radius: 10px; height: 12px; width: 100%; margin-top: 5px;">
-            <div style="background-color: #9b59b6; height: 12px; width: 25%; border-radius: 10px;"></div>
+        <div class="tracker-card" style="margin-bottom: 25px; padding: 15px; border: 1px solid #e1e4e8; border-radius: 10px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h3 style="margin: 0; color: #9b59b6;">🪐 Princeton: Other Earths</h3>
+                <span id="astro-percent" style="font-weight: bold;">0%</span>
+            </div>
+            <div style="background: #eee; height: 10px; border-radius: 5px; margin: 10px 0;">
+                <div id="astro-bar" style="background: #9b59b6; height: 100%; width: 0%; border-radius: 5px; transition: width 0.5s;"></div>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 0.9em;">
+                <label><input type="checkbox" class="astro-check" onchange="updateProgress()"> Lec 1: Intro</label>
+                <label><input type="checkbox" class="astro-check" onchange="updateProgress()"> Lec 2: Transits</label>
+                <label><input type="checkbox" class="astro-check" onchange="updateProgress()"> Lec 3: Habitable</label>
+                <label><input type="checkbox" class="astro-check" onchange="updateProgress()"> Assignment 1</label>
+            </div>
         </div>
+
     </div>
-</section>
+</div>
+
+<script>
+    // A. The Dynamic Countdown
+    function calculateCountdown() {
+        const targetDate = new Date("June 7, 2026 00:00:00").getTime();
+        const now = new Date().getTime();
+        const difference = targetDate - now;
+        const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+        document.getElementById("countdown-timer").innerText = days;
+    }
+
+    // B. The Progress Bar Logic
+    function updateProgress() {
+        // Track Math
+        const mathChecks = document.querySelectorAll('.math-check');
+        const mathChecked = Array.from(mathChecks).filter(i => i.checked).length;
+        const mathPercent = (mathChecked / mathChecks.length) * 100;
+        document.getElementById('math-bar').style.width = mathPercent + "%";
+        document.getElementById('math-percent').innerText = Math.round(mathPercent) + "%";
+
+        // Track Astronomy
+        const astroChecks = document.querySelectorAll('.astro-check');
+        const astroChecked = Array.from(astroChecks).filter(i => i.checked).length;
+        const astroPercent = (astroChecked / astroChecks.length) * 100;
+        document.getElementById('astro-bar').style.width = astroPercent + "%";
+        document.getElementById('astro-percent').innerText = Math.round(astroPercent) + "%";
+        
+        // Save to LocalStorage
+        saveCheckboxes();
+    }
+
+    // C. Persistence (Saving your work)
+    function saveCheckboxes() {
+        const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+        const status = Array.from(checkboxes).map(cb => cb.checked);
+        localStorage.setItem('missionStatus', JSON.stringify(status));
+    }
+
+    function loadCheckboxes() {
+        const status = JSON.parse(localStorage.getItem('missionStatus'));
+        if (status) {
+            const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+            status.forEach((checked, index) => {
+                if (checkboxes[index]) checkboxes[index].checked = checked;
+            });
+            updateProgress();
+        }
+    }
+
+    // Initialize the Dashboard
+    calculateCountdown();
+    loadCheckboxes();
+</script>
     <section style="font-family: 'Segoe UI', sans-serif; background-color: #ffffff; padding: 25px; border-radius: 15px; margin-top: 20px; border: 1px solid #d1d5da;">
     <h2 style="color: #000000 !important; margin-top: 0; font-size: 1.5em;">🛰️ Researcher Logs</h2>
     
@@ -494,6 +569,7 @@
 </script>
 </body>
 </html>
+
 
 
 
